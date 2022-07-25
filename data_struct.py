@@ -39,7 +39,7 @@ def pass_all_files(root_path: str,words_dictionary:dict) -> None:
         if file.endswith('.txt'):
             read_file(root_path + '\\' + file, words_dictionary)
         else:
-            pass_all_files(root_path + '\\' + file)
+            pass_all_files(root_path + '\\' + file,words_dictionary)
 
 
 def main():
