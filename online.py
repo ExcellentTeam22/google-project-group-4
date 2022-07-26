@@ -2,24 +2,33 @@
 import re
 import data_struct
 import linecache
+import AutoCompleteData
 
 WORD_DICTIONARY = data_struct.main()
+RESULTS_NUMBER = 5
 
 
 def clear_sentence(sentence: str):
     return ' '.join(re.findall(r'\w+', sentence))
 
 
-def find_includes_sentences(sentences:set,sub_sentence:str):
-    return [sentence for sentence in sentences if sub_sentence in clear_sentence(sentence)]
+def scoring(sub_sentence):
+    return len(sub_sentence)*2
 
 
+def from_location_to_autocomplete(location , sub_sentence):
+    sentence = linecache.getline(location[0], location[1])
+    if sub_sentence in clear_sentence(sentence):
+        return AutoCompleteData.AutoCompleteData(sentence,location[0].split('\\')[-1][:-4:],location[1],scoring(sub_sentence))
+    return None
 
-def from_offset_to_sentence(locations: set):
-    sentences = [linecache.getline(location[0], location[1]) for location in locations]
 
-    print(sentences)
-    return sentences
+def fix_sentence():
+    return set()
+
+
+def sorting(auto_complete_candidates):
+    return list(auto_complete_candidates)[:5]
 
 
 def user_query():
@@ -32,10 +41,21 @@ def user_query():
     for index,word in enumerate(words):
         if index != 0 and word in WORD_DICTIONARY:
             locations_intersections = locations_intersections.intersection(WORD_DICTIONARY[word])
-        if not word in WORD_DICTIONARY:
+        if word not in WORD_DICTIONARY:
             locations_intersections = {}
             break
-    print(find_includes_sentences(from_offset_to_sentence(locations_intersections),' '.join(words)))
+
+    auto_complete_candidates = {from_location_to_autocomplete(location,' '.join(words)) for location in locations_intersections} - {None}
+    if len(auto_complete_candidates ) < RESULTS_NUMBER:
+        auto_complete_candidates=auto_complete_candidates.union(fix_sentence())
+
+
+    top_five= sorting(auto_complete_candidates)
+
+    [print(i) for i in auto_complete_candidates]
+
+
+
 
 
 
