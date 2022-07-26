@@ -45,7 +45,7 @@ def pass_all_files(root_path: str,words_dictionary:dict) -> None:
 def main():
     words_dictionary = dict()
     pass_all_files(USER_PATH,words_dictionary)
-    print(words_dictionary)
+    return words_dictionary
 
 
 if __name__ == "__main__":
