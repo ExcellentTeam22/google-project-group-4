@@ -4,6 +4,9 @@ import re
 import os
 import shutil
 
+#from pytrie import Trie
+import pygtrie
+
 USER_PATH_ZIP = r"C:\Users\nechama\Desktop\bootcamp\google\arc.zip"
 USER_PATH = r"C:\Users\nechama\Desktop\bootcamp\google\arc"
 
@@ -43,9 +46,11 @@ def pass_all_files(root_path: str,words_dictionary:dict) -> None:
 
 
 def main():
-    words_dictionary = dict()
-    pass_all_files(USER_PATH,words_dictionary)
-    return words_dictionary
+    words_trie = pygtrie.CharTrie()
+
+    pass_all_files(USER_PATH,words_trie)
+    #print(words_trie)
+    return words_trie
 
 
 if __name__ == "__main__":
