@@ -7,7 +7,8 @@ import shutil
 import pygtrie
 
 USER_PATH_ZIP = r"C:\Users\nechama\Desktop\bootcamp\google\arc.zip"
-USER_PATH = r"C:\Users\97252\bootcamp\projects\google\Archive"
+USER_PATH = r"C:\Users\nechama\Desktop\bootcamp\google\arc"
+# USER_PATH = r"Archive"
 
 
 def enter_to_dictionary(sentence: str, line_number: int, path: str, word_dictionary: pygtrie.CharTrie) -> None:
