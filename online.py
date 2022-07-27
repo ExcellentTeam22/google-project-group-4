@@ -95,3 +95,8 @@ def intersections_without_word(words, without_word):
 
 
 
+def is_change_one_char(word: str):
+    for index, char in reversed(list(enumerate(word[-1::-1]))):
+        for i in range(97, 123):
+            if chr(i) != word[index] and word[0:index] + chr(i) + word[index+1:] in WORD_TRIE:
+                yield word[0:index] + chr(i) + word[index+1:]
