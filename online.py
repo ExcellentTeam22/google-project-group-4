@@ -44,7 +44,7 @@ def intersections_without_word(words: list, without_word: str):
     locations = [WORD_TRIE.get(word) for word in words if word != without_word]
     if None in locations or not locations:
         return set()
-    print(locations)
+   # print(locations)
     return set.intersection(*locations)
 
 
@@ -141,25 +141,43 @@ def fix_sentence(words: list,number_of_result:int):
             results=results.union({location_to_autocomplete(location,sub_sentence.replace(word,fix_word)) for location in intersection_locations} - {None})
             if len(results) >= number_of_result:
                 return results
+    return results
 
 
 def user_query():
     sentence = input("Hello, enter the text that you to find:\n")
-    words = re.findall(r'\w+', sentence.lower())
+    while True:
 
+        if sentence.endswith('#'):
+            sentence = input("Hello, enter the text that you to find:\n")
+        words = re.findall(r'\w+', sentence.lower())
+        if not words :
+            sentence = input("Hello, enter the text that you to find:\n")
+            continue
+        # check if the first word is exist
+        locations_intersections = intersections_without_word(words,None)
 
-    # check if the first word is exist
-    locations_intersections = intersections_without_word(words,None)
+        auto_complete_candidates = list({location_to_autocomplete(location,' '.join(words)) for location in locations_intersections} - {None})
+        #print("the candidate: ", auto_complete_candidates)
 
-    auto_complete_candidates = list({location_to_autocomplete(location,' '.join(words)) for location in locations_intersections} - {None})
-    #print("the candidate: ", auto_complete_candidates)
+        if auto_complete_candidates or len(auto_complete_candidates ) < RESULTS_NUMBER:
+            auto_complete_candidates+=list(fix_sentence(words,RESULTS_NUMBER-len(auto_complete_candidates )))
 
-    if auto_complete_candidates or len(auto_complete_candidates ) < RESULTS_NUMBER:
-        auto_complete_candidates+=list(fix_sentence(words,RESULTS_NUMBER-len(auto_complete_candidates )))
+        top_results = auto_complete_candidates[:5] #need to sort
 
-    top_five = auto_complete_candidates[:5] #need to sort
+        #[print(i) for i in top_results]
 
-    [print(i) for i in top_five]
+        if sentence[:-1] != "":
+            if len(top_results) == 0:
+                print("Sorry, we did not find autocompletes to your sentence")
+            else:
+                print(f"Here are {len(top_results)} suggestions:")
+                for i in range(0, len(top_results)):
+                    print(f"{i+1}. {top_results[i]}")
+        if not sentence.endswith('#'):
+            sentence += input(sentence)
+        else:
+            sentence = input("Hello, enter the text that you to find:\n")
 
 
 def main():
