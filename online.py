@@ -9,22 +9,33 @@ WORD_TRIE = data_struct.main()
 RESULTS_NUMBER = 5
 
 
-def clear_sentence(sentence: str):
-    return ' '.join(re.findall(r'\w+', sentence))
+def clear_sentence(sentence: str) -> str:
+    """
+    The function gets a sentence and return it lower and without punctuation
+    """
+    return ' '.join(re.findall(r'\w+', sentence.lower()))
 
 
-def scoring(sub_sentence):
+def scoring(sub_sentence) -> int:
+    """
+    The function get a sub_sentence and return its score
+    :param sub_sentence:
+    :return:
+    """
     return len(sub_sentence)*2
 
 
-def location_to_autocomplete(location , sub_sentence):
+def location_to_autocomplete(location , sub_sentence) -> AutoCompleteData:
+    """
+    The function return a AutoCompleteData object by location
+    """
     sentence = linecache.getline(location[0], location[1])
     if sub_sentence in clear_sentence(sentence):
         return AutoCompleteData.AutoCompleteData(sentence,location[0].split('\\')[-1][:-4:],location[1],scoring(sub_sentence))
     return None
 
 
-def get_location_by_prefix(prefix: str):
+def get_location_by_prefix(prefix: str) -> tuple():
     """
     The function get a prefix and return the locations of the words that start with this prefix
     """
@@ -33,23 +44,21 @@ def get_location_by_prefix(prefix: str):
         if prefix in WORD_TRIE:
             next(item_iterator)
         for item in item_iterator:
-            yield item[0],item[1]
+            yield item
 
 
-def intersections_without_word(words: list, without_word: str):
+def intersections_without_word(words: list, without_word: str)->set:
     """
     The function returns the intersection of the locations of the words without one word
     """
-
     locations = [WORD_TRIE.get(word) for word in words if word != without_word]
     if None in locations or not locations:
         return set()
-   # print(locations)
     return set.intersection(*locations)
 
 
-def sorting(auto_complete_candidates):
-    return list(auto_complete_candidates)[:5]
+# def sorting(auto_complete_candidates):
+#     return list(auto_complete_candidates)[:5]
 
 
 def is_change_one_char(word: str):
@@ -58,10 +67,6 @@ def is_change_one_char(word: str):
             if chr(i) != word[index] and word[0:index] + chr(i) + word[index+1:] in WORD_TRIE:
                 fix_word = word[0:index] + chr(i) + word[index+1:]
                 yield fix_word,find_word_in_trie(fix_word)
-
-
-
-
 
 
 def find_word_in_trie(word_fix: str) -> set:
@@ -102,16 +107,17 @@ def fix_word_add_remove(word_to_fix: str) -> set:
         yield word_fix,find_word_in_trie(word_fix)
 
 
-
-
-
-
-
-def fix_sentence(words: list,number_of_result:int):
+def fix_sentence(words: list,number_of_result: int) -> set:
+    """
+    The function return try to fix the sentence and return
+    :param words: the sentence's words
+    :param number_of_result: the minimum results to return
+    :return: set of the results
+    """
     results = set()
     locations = intersections_without_word(words,words[-1])
     sub_sentence = " ".join(words)
-    for fix_word,prefix_locations in get_location_by_prefix(words[-1]):
+    for fix_word,prefix_locations in get_location_by_prefix(words[-1]):  # prefix
         if len(words) <= 1:
             intersection_locations = prefix_locations
         else:
@@ -120,7 +126,7 @@ def fix_sentence(words: list,number_of_result:int):
         if len(results) >= number_of_result:
             return results
 
-    for word in words[-1::-1]:
+    for word in words[-1::-1]:  # changes
         locations = intersections_without_word(words, word)
         for fix_word,fix_location in  is_change_one_char(word):
             if len(words)<=1:
@@ -131,9 +137,9 @@ def fix_sentence(words: list,number_of_result:int):
             if len(results) >= number_of_result:
                 return results
 
-    for word in words[-1::-1]:
+    for word in words[-1::-1]: # add or remove
         locations = intersections_without_word(words, word)
-        for fix_word,fix_location in  fix_word_add_remove(word):
+        for fix_word,fix_location in fix_word_add_remove(word):
             if len(words) <= 1:
                 intersection_locations = fix_location
             else:
@@ -145,6 +151,9 @@ def fix_sentence(words: list,number_of_result:int):
 
 
 def user_query():
+    """
+    The function manages the communication with the client
+    """
     sentence = input("Hello, enter the text that you to find:\n")
     while True:
 
