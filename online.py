@@ -4,7 +4,8 @@ import data_struct
 import linecache
 import AutoCompleteData
 
-WORD_DICTIONARY = data_struct.main()
+WORD_TRIE = data_struct.main()
+
 RESULTS_NUMBER = 5
 
 
@@ -35,13 +36,14 @@ def user_query():
     sentence = input("Hello, enter the text that you to find:\n")
     words = re.findall(r'\w+', sentence.lower())
 
+
     # check if the first word is exist
-    locations_intersections = set(WORD_DICTIONARY[words[0]])
+    locations_intersections = set(WORD_TRIE[words[0]])
 
     for index,word in enumerate(words):
-        if index != 0 and word in WORD_DICTIONARY:
-            locations_intersections = locations_intersections.intersection(WORD_DICTIONARY[word])
-        if word not in WORD_DICTIONARY:
+        if index != 0 and word in WORD_TRIE:
+            locations_intersections = locations_intersections.intersection(WORD_TRIE[word])
+        if word not in WORD_TRIE:
             locations_intersections = {}
             break
 
@@ -49,8 +51,7 @@ def user_query():
     if len(auto_complete_candidates ) < RESULTS_NUMBER:
         auto_complete_candidates=auto_complete_candidates.union(fix_sentence())
 
-
-    top_five= sorting(auto_complete_candidates)
+    top_five = sorting(auto_complete_candidates)
 
     [print(i) for i in auto_complete_candidates]
 
@@ -66,3 +67,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def get_location_by_prefix(prefix: str):
+    for locations in  WORD_TRIE.items(prefix=prefix):
+        yield locations[1]
+    #prefix_locations = set.union(*(locations[1] for locations in WORD_TRIE.items(prefix=prefix))) #{WORD_TRIE.items(prefix=prefix)}
+   # return prefix_locations
+
+
+def get_sentences_by_prefix(prefix:str,words):
+    for locations in get_location_by_prefix(prefix):
+        yield set.intersection(*[locations]+[WORD_TRIE[word] for word in words[:-2]])
