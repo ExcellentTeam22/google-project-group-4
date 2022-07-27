@@ -56,11 +56,6 @@ def user_query():
     [print(i) for i in auto_complete_candidates]
 
 
-
-
-
-
-
 def main():
     user_query()
 
@@ -70,12 +65,33 @@ if __name__ == "__main__":
 
 
 def get_location_by_prefix(prefix: str):
-    for locations in  WORD_TRIE.items(prefix=prefix):
-        yield locations[1]
-    #prefix_locations = set.union(*(locations[1] for locations in WORD_TRIE.items(prefix=prefix))) #{WORD_TRIE.items(prefix=prefix)}
-   # return prefix_locations
+    """
+    The function get a prefix and return the locations of the words that start with this prefix
+    """
+    item_iterator = iter(WORD_TRIE.items(prefix=prefix))
+    if prefix in WORD_TRIE:
+        next(item_iterator)
+    for item in item_iterator:
+        yield item[1]
 
 
-def get_sentences_by_prefix(prefix:str,words):
+def prefix_locations_intersection(prefix: str, words):
+    """
+    The function get a prefix and return the intersection of the prefix's locations with the locations of the other words
+    """
+
     for locations in get_location_by_prefix(prefix):
         yield set.intersection(*[locations]+[WORD_TRIE[word] for word in words[:-2]])
+
+
+def intersections_without_word(words, without_word):
+    """
+    The function returns the intersection of the locations of the words without one word
+    """
+    locations = {WORD_TRIE.get(word) for word in words if word != without_word}
+    if None in locations:
+        return {}
+    return set.intersection(*locations)
+
+
+
